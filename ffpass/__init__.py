@@ -148,7 +148,8 @@ def decrypt_aes(decoded_item, master_password, global_salt):
     key_length = int(decoded_item[0][0][1][0][1][2])
     assert key_length == 32
 
-    encoded_password = sha1(global_salt + master_password.encode('utf-8')).digest()
+    encoded_password = sha1(
+        global_salt + master_password.encode('utf-8')).digest()
     key = pbkdf2_hmac(
         'sha256', encoded_password,
         entry_salt, iteration_count, dklen=key_length)
@@ -221,6 +222,10 @@ def exportLogins(key, jsonLogins):
                 row["hostname"],
                 decodeLoginData(key, encUsername),
                 decodeLoginData(key, encPassword),
+                row["httpRealm"],
+                str(row["formSubmitURL"] or None),
+                row["usernameField"],
+                row["passwordField"],
             )
         )
     return logins
@@ -236,7 +241,8 @@ def readCSV(csv_file):
     logins = []
     reader = csv.DictReader(lower_header(csv_file))
     for row in reader:
-        logins.append((rawURL(row["url"]), row["username"], row["password"]))
+        logins.append((rawURL(row["url"]), row["username"], row["password"], row["httprealm"], str(
+            row["formsubmiturl"] or None), row["usernamefield"], row["passwordfield"]))
     logging.info(f'read {len(logins)} logins')
     return logins
 
@@ -246,19 +252,26 @@ def rawURL(url):
     return type(p)(*p[:2], *[""] * 4).geturl()
 
 
-def addNewLogins(key, jsonLogins, logins):
+def addNewLogins(key, jsonLogins, logins, overwrite=False):
     nextId = jsonLogins["nextId"]
     timestamp = int(datetime.now().timestamp() * 1000)
     logging.info('adding logins')
-    for i, (url, username, password) in enumerate(logins, nextId):
+    existing = {}
+    for i, entry in enumerate(jsonLogins["logins"]):
+        existing[entry["hostname"] + "##" + decodeLoginData(key, entry["encryptedUsername"])] = {
+            "index": i,
+            "password": decodeLoginData(key, entry["encryptedPassword"])
+        }
+    print(existing)
+    for i, (url, username, password, realm, formSubmitUrl, usernameField, passwordField) in enumerate(logins, nextId):
         logging.debug(f'adding {url} {username}')
         entry = {
             "id": i,
             "hostname": url,
-            "httpRealm": None,
-            "formSubmitURL": "",
-            "usernameField": "",
-            "passwordField": "",
+            "httpRealm": realm,
+            "formSubmitURL": formSubmitUrl,
+            "usernameField": usernameField,
+            "passwordField": passwordField,
             "encryptedUsername": encodeLoginData(key, username),
             "encryptedPassword": encodeLoginData(key, password),
             "guid": "{%s}" % uuid4(),
@@ -268,7 +281,15 @@ def addNewLogins(key, jsonLogins, logins):
             "timePasswordChanged": timestamp,
             "timesUsed": 0,
         }
-        jsonLogins["logins"].append(entry)
+        if url + "##" + username in existing:
+            if password == existing[url + "##" + username]["password"]:
+                pass # just skip, the same password already exists in the database
+            elif overwrite:
+                jsonLogins["logins"][existing[url + "##" + username]["index"]] = entry
+            else:
+                logging.warning(f"An entry already exists for '{username}' on host '{url}' with a different password. You can specify --overwrite to force an update.") 
+        else:
+            jsonLogins["logins"].append(entry)
     jsonLogins["nextId"] += len(logins)
 
 
@@ -281,12 +302,14 @@ def guessDir():
     }
 
     if sys.platform not in dirs:
-        logging.error(f"Automatic profile selection is not supported for {sys.platform}")
+        logging.error(
+            f"Automatic profile selection is not supported for {sys.platform}")
         logging.error("Please specify a profile to parse (-d path/to/profile)")
         raise NoProfile
 
     paths = Path(dirs[sys.platform]).expanduser()
-    profiles = [path.parent for path in paths.glob(os.path.join("*", "logins.json"))]
+    profiles = [path.parent for path in paths.glob(
+        os.path.join("*", "logins.json"))]
     logging.debug(f"Paths: {paths}")
     logging.debug(f"Profiles: {profiles}")
 
@@ -295,8 +318,10 @@ def guessDir():
         raise NoProfile
 
     if len(profiles) > 1:
-        logging.error("More than one profile detected. Please specify a profile to parse (-d path/to/profile)")
-        logging.error("valid profiles:\n\t\t" + '\n\t\t'.join(map(str, profiles)))
+        logging.error(
+            "More than one profile detected. Please specify a profile to parse (-d path/to/profile)")
+        logging.error("valid profiles:\n\t\t" +
+                      '\n\t\t'.join(map(str, profiles)))
         raise NoProfile
 
     profile_path = profiles[0]
@@ -326,7 +351,8 @@ def main_export(args):
     jsonLogins = getJsonLogins(args.directory)
     logins = exportLogins(key, jsonLogins)
     writer = csv.writer(args.file)
-    writer.writerow(["url", "username", "password"])
+    writer.writerow(["url", "username", "password", "httpRealm",
+                    "formSubmitURL", "usernameField", "passwordField"])
     writer.writerows(logins)
 
 
@@ -337,13 +363,14 @@ def main_import(args):
         except WrongPassword:
             # it is not possible to read the password
             # if stdin is used for input
-            logging.error("Password is not empty. You have to specify FROM_FILE.")
+            logging.error(
+                "Password is not empty. You have to specify FROM_FILE.")
             sys.exit(1)
     else:
         key = askpass(args.directory)
     jsonLogins = getJsonLogins(args.directory)
     logins = readCSV(args.file)
-    addNewLogins(key, jsonLogins, logins)
+    addNewLogins(key, jsonLogins, logins, args.overwrite)
     dumpJsonLogins(args.directory, jsonLogins)
 
 
@@ -357,7 +384,7 @@ def makeParser():
     subparsers.required = True
 
     parser_export = subparsers.add_parser(
-        "export", description="outputs a CSV with header `url,username,password`"
+        "export", description="outputs a CSV with header `url,username,password,httpRealm,formSubmitURL`"
     )
     parser_import = subparsers.add_parser(
         "import",
@@ -391,13 +418,16 @@ def makeParser():
         sub.add_argument("-v", "--verbose", action="store_true")
         sub.add_argument("--debug", action="store_true")
 
+    parser_import.add_argument("--overwrite", action="store_true")
+
     parser_import.set_defaults(func=main_import)
     parser_export.set_defaults(func=main_export)
     return parser
 
 
 def main():
-    logging.basicConfig(level=logging.ERROR, format="%(levelname)s: %(message)s")
+    logging.basicConfig(level=logging.WARNING,
+                        format="%(levelname)s: %(message)s")
 
     parser = makeParser()
     args = parser.parse_args()
@@ -407,7 +437,7 @@ def main():
     elif args.debug:
         log_level = logging.DEBUG
     else:
-        log_level = logging.ERROR
+        log_level = logging.WARNING
 
     logging.getLogger().setLevel(log_level)
 
@@ -423,7 +453,8 @@ def main():
     try:
         args.func(args)
     except NoDatabase:
-        logging.error("Firefox password database is empty. Please create it from Firefox.")
+        logging.error(
+            "Firefox password database is empty. Please create it from Firefox.")
 
 
 if __name__ == "__main__":
