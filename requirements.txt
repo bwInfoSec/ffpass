@@ -1,3 +1,4 @@
 pyasn1
 pycryptodome
 pytest
+pytest-cov
