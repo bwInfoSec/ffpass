@@ -9,11 +9,11 @@ def read(fname):
 
 
 setup(
-    name="ffpass",
-    version="0.5.0",
-    author="Louis Abraham",
+    name="ffpass-next",
+    version="0.1.0",
+    author="Stefan Machmeier",
     license="MIT",
-    author_email="louis.abraham@yahoo.fr",
+    author_email="stefan-machmeier@outlook.com",
     description="Import and Export passwords for Firefox",
     long_description=read("README.md"),
     long_description_content_type="text/markdown",
