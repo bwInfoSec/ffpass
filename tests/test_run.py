@@ -10,7 +10,7 @@ EXPECTED_IMPORT_OUTPUT = EXPECTED_EXPORT_OUTPUT + IMPORT_CREDENTIAL
 
 
 def run_ffpass(mode, path):
-    command = ["ffpass", mode, "-d", path]
+    command = ["ffpass-next", mode, "-d", path]
     if mode == 'import':
         ffpass_input = HEADER + IMPORT_CREDENTIAL
     else:
@@ -19,16 +19,16 @@ def run_ffpass(mode, path):
     return subprocess.run(command, stdout=subprocess.PIPE, input=ffpass_input, encoding='utf-8')
 
 
-# def test_legacy_firefox_export():
-#     r = run_ffpass('export', 'tests/firefox-70')
-#     r.check_returncode()
-#     assert r.stdout == EXPECTED_EXPORT_OUTPUT
+def test_legacy_firefox_export():
+    r = run_ffpass('export', 'tests/firefox-70')
+    r.check_returncode()
+    assert r.stdout == EXPECTED_EXPORT_OUTPUT
 
 
-# def test_firefox_export():
-#     r = run_ffpass('export', 'tests/firefox-84')
-#     r.check_returncode()
-#     assert r.stdout == EXPECTED_EXPORT_OUTPUT
+def test_firefox_export():
+    r = run_ffpass('export', 'tests/firefox-84')
+    r.check_returncode()
+    assert r.stdout == EXPECTED_EXPORT_OUTPUT
 
 
 def test_legacy_firefox():

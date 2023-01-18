@@ -18,9 +18,9 @@ setup(
     long_description=read("README.md"),
     long_description_content_type="text/markdown",
     url="https://github.com/bwInfoSec/ffpass",
-    packages=["ffpass"],
+    packages=["ffpass_next"],
     install_requires=["pyasn1", "pycryptodome"],
     python_requires=">=3.6",
-    entry_points={"console_scripts": ["ffpass-next = ffpass:main"]},
+    entry_points={"console_scripts": ["ffpass-next = ffpass_next:main"]},
     classifiers=["Topic :: Utilities", "Topic :: Security :: Cryptography"],
 )
