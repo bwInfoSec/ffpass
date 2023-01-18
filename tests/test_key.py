@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import ffpass
+import ffpass_next
 from pathlib import Path
 import pytest
 
@@ -9,30 +9,30 @@ MASTER_PASSWORD = 'test'
 
 
 def test_firefox_key():
-    key = ffpass.getKey(Path('tests/firefox-84'))
+    key = ffpass_next.getKey(Path('tests/firefox-84'))
     assert key == TEST_KEY
 
 
 def test_firefox_mp_key():
-    key = ffpass.getKey(Path('tests/firefox-mp-84'), MASTER_PASSWORD)
+    key = ffpass_next.getKey(Path('tests/firefox-mp-84'), MASTER_PASSWORD)
     assert key == TEST_KEY
 
 
 def test_firefox_wrong_masterpassword_key():
-    with pytest.raises(ffpass.WrongPassword):
-        ffpass.getKey(Path('tests/firefox-mp-84'), 'wrongpassword')
+    with pytest.raises(ffpass_next.WrongPassword):
+        ffpass_next.getKey(Path('tests/firefox-mp-84'), 'wrongpassword')
 
 
 def test_legacy_firefox_key():
-    key = ffpass.getKey(Path('tests/firefox-70'))
+    key = ffpass_next.getKey(Path('tests/firefox-70'))
     assert key == TEST_KEY
 
 
 def test_legacy_firefox_mp_key():
-    key = ffpass.getKey(Path('tests/firefox-mp-70'), MASTER_PASSWORD)
+    key = ffpass_next.getKey(Path('tests/firefox-mp-70'), MASTER_PASSWORD)
     assert key == TEST_KEY
 
 
 def test_legacy_firefox_wrong_masterpassword_key():
-    with pytest.raises(ffpass.WrongPassword):
-        ffpass.getKey(Path('tests/firefox-mp-70'), 'wrongpassword')
+    with pytest.raises(ffpass_next.WrongPassword):
+        ffpass_next.getKey(Path('tests/firefox-mp-70'), 'wrongpassword')
