@@ -5,9 +5,9 @@
 
 """
 The MIT License (MIT)
-Copyright (c) 2018 Louis Abraham <louis.abraham@yahoo.fr>
-Laurent Clevy (@lorenzo2472)
-# from https://github.com/lclevy/firepwd/blob/master/firepwd.py
+Copyright (c) 2023 Stefan Machmeier <stefan-machmeier@outlook.com>
+Derived from Louis Abraham (@louisabraham) https://github.com/louisabraham/ffpass
+
 \x1B[34m\033[F\033[F
 
 ffpass can import and export passwords from Firefox Quantum.
@@ -21,7 +21,7 @@ example of usage:
 
 \033[0m\033[1;32m\033[F\033[F
 
-If you found this code useful, add a star on <https://github.com/louisabraham/ffpass>!
+If you found this code useful, add a star on <https://github.com/bwInfoSec/ffpass>!
 
 \033[0m\033[F\033[F
 """
@@ -376,7 +376,7 @@ def main_import(args):
 
 def makeParser():
     parser = argparse.ArgumentParser(
-        prog="ffpass",
+        prog="ffpass-next",
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
@@ -384,7 +384,7 @@ def makeParser():
     subparsers.required = True
 
     parser_export = subparsers.add_parser(
-        "export", description="outputs a CSV with header `url,username,password,httpRealm,formSubmitURL`"
+        "export", description="outputs a CSV with header `url,username,password,httpRealm,formSubmitURL,usernameField,passwordField`"
     )
     parser_import = subparsers.add_parser(
         "import",
