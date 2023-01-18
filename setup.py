@@ -10,7 +10,7 @@ def read(fname):
 
 setup(
     name="ffpass-next",
-    version="0.1.0",
+    version="0.1.1",
     author="Stefan Machmeier",
     license="MIT",
     author_email="stefan-machmeier@outlook.com",
