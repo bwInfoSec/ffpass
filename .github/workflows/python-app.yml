@@ -47,7 +47,7 @@ jobs:
 
   publish-test-results:
     name: "Publish Unit Tests Results"
-    needs: test
+    needs: build
     runs-on: ubuntu-latest
     if: success() || failure()
 
