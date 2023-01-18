@@ -17,7 +17,7 @@ setup(
     description="Import and Export passwords for Firefox",
     long_description=read("README.md"),
     long_description_content_type="text/markdown",
-    url="https://github.com/louisabraham/ffpass",
+    url="https://github.com/bwInfoSec/ffpass",
     packages=["ffpass"],
     install_requires=["pyasn1", "pycryptodome"],
     python_requires=">=3.6",

@@ -1,6 +1,6 @@
 [![PyPI
-version](https://badge.fury.io/py/ffpass.svg)](https://badge.fury.io/py/ffpass)
-[![Downloads](https://pepy.tech/badge/ffpass)](https://pepy.tech/project/ffpass)
+version](https://badge.fury.io/py/ffpass-next.svg)](https://badge.fury.io/py/ffpass-next)
+[![Downloads](https://pepy.tech/badge/ffpass-next)](https://pepy.tech/project/ffpass-next)
 
 # ffpass - Import and Export passwords for Firefox Quantum
 
@@ -171,7 +171,7 @@ ffpass export --file passwords.csv
 
   - `TypeError: 'PosixPath' object is not iterable`
     
-    See [\#17](https://github.com/louisabraham/ffpass/issues/17).
+    See [\#17](https://github.com/bwInfoSec/ffpass/issues/17).
 
   - Empty url field ("example.com") in Firefox after importing: the urls of the source
     csv file must begin with a scheme (`http://`, `https://`, `ftp://`,
@@ -184,5 +184,5 @@ ffpass export --file passwords.csv
 
 ## Credits
 
-Thanks a lot to @lclevy for the retro-engineering\! I was inspired by
-his repository <https://github.com/lclevy/firepwd>.
+Thanks a lot to @louisabraham <https://github.com/louisabraham/ffpass>
+Thanks a lot to @lclevy for the retro-engineering\! I was inspired by his repository <https://github.com/lclevy/firepwd>.
