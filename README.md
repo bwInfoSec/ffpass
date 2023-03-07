@@ -1,7 +1,7 @@
 [![PyPI
 version](https://badge.fury.io/py/ffpass-next.svg)](https://badge.fury.io/py/ffpass-next)
 [![Downloads](https://pepy.tech/badge/ffpass-next)](https://pepy.tech/project/ffpass-next)
-
+[![Tests](https://gist.githubusercontent.com/br-olf/083df514af0739060e1d778a6da65937/raw/badge.svg)](tests)
 # ffpass-next - Import and Export passwords for Firefox Quantum
 
 The latest version of Firefox doesn't allow to import or export the stored logins and passwords as a file.
